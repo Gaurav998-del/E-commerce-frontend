@@ -70,7 +70,7 @@ export default function CartPage() {
                 <div className="lg:w-2/3 w-full bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                     <div className="divide-y divide-gray-100">
                         {items.map((item) => (
-                            <CartItem key={item._id} item={item} />
+                            <CartItem key={item.id} item={item} />
                         ))}
                     </div>
                     <div className="p-6 bg-gray-50 border-t border-gray-100 flex justify-between items-center text-sm font-medium">

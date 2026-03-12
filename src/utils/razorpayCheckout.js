@@ -31,6 +31,7 @@ export const initializeRazorpayCheckout = async (orderId, amount, userData, onSu
         description: `Test Transaction for Order ${orderId}`,
         order_id: orderId, // This should be the razorpay order_id created via your backend
         handler: async function (response) {
+            console.log("RAZORPAY  RESPONSE", response);
             try {
                 const verifyData = {
                     razorpay_order_id: response.razorpay_order_id,

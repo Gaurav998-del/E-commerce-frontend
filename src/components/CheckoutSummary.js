@@ -5,11 +5,13 @@ import { useSelector } from 'react-redux';
 
 export default function CheckoutSummary({ onProceedToPay, isProcessing }) {
     const { totalPrice, totalQty } = useSelector((state) => state.cart);
+    console.log("Total Price", totalPrice);
+    
 
     const taxRate = 0.18; // 18% GST example
     const taxAmount = totalPrice * taxRate;
     const shippingCost = totalPrice > 500 ? 0 : 50;
-    const grandTotal = totalPrice + taxAmount + shippingCost;
+    const grandTotal = totalPrice;
 
     return (
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sticky top-24">

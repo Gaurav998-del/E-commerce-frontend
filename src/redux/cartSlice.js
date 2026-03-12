@@ -10,28 +10,30 @@ export const fetchCart = createAsyncThunk('cart/fetch', async (_, { rejectWithVa
     }
 });
 
-export const addItemToCart = createAsyncThunk('cart/add', async ({ productId: product_id, quantity }, { rejectWithValue }) => {
-    
+export const addItemToCart = createAsyncThunk('cart/add', async ({ productId: product_id, quantity }, { dispatch, rejectWithValue }) => {
     try {
         const data = await cartApi.addToCart(product_id, quantity);
+        dispatch(fetchCart());
         return data;
     } catch (error) {
         return rejectWithValue(error.response?.data?.message || 'Failed to add item to cart');
     }
 });
 
-export const updateItemInCart = createAsyncThunk('cart/update', async ({ productId, quantity }, { rejectWithValue }) => {
+export const updateItemInCart = createAsyncThunk('cart/update', async ({ productId, quantity }, { dispatch, rejectWithValue }) => {
     try {
         const data = await cartApi.updateCartItem(productId, quantity);
+        dispatch(fetchCart());
         return data;
     } catch (error) {
         return rejectWithValue(error.response?.data?.message || 'Failed to update item in cart');
     }
 });
 
-export const removeItemFromCart = createAsyncThunk('cart/remove', async (productId, { rejectWithValue }) => {
+export const removeItemFromCart = createAsyncThunk('cart/remove', async (cartId, { dispatch, rejectWithValue }) => {
     try {
-        const data = await cartApi.removeFromCart(productId);
+        const data = await cartApi.removeFromCart(cartId);
+        dispatch(fetchCart());
         return data;
     } catch (error) {
         return rejectWithValue(error.response?.data?.message || 'Failed to remove item from cart');
@@ -78,16 +80,15 @@ const cartSlice = createSlice({
             .addCase(fetchCart.fulfilled, handleFulfilled)
             .addCase(fetchCart.rejected, handleRejected)
 
+            // For add, update, remove: just set loading state while they run.
+            // fetchCart will populate the data once they succeed.
             .addCase(addItemToCart.pending, handlePending)
-            .addCase(addItemToCart.fulfilled, handleFulfilled)
             .addCase(addItemToCart.rejected, handleRejected)
 
             .addCase(updateItemInCart.pending, handlePending)
-            .addCase(updateItemInCart.fulfilled, handleFulfilled)
             .addCase(updateItemInCart.rejected, handleRejected)
 
             .addCase(removeItemFromCart.pending, handlePending)
-            .addCase(removeItemFromCart.fulfilled, handleFulfilled)
             .addCase(removeItemFromCart.rejected, handleRejected);
     },
 });

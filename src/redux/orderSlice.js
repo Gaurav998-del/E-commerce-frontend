@@ -2,6 +2,8 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import * as orderApi from '../services/orderApi';
 
 export const placeOrder = createAsyncThunk('orders/place', async (orderData, { rejectWithValue }) => {
+    console.log("ORDER DATA", orderData);
+    
     try {
         const data = await orderApi.createOrder(orderData);
         return data;

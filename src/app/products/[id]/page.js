@@ -14,6 +14,13 @@ export default function ProductDetailsPage() {
     const dispatch = useDispatch();
     const { currentProduct: product, isLoading, error } = useSelector((state) => state.products);
     const [quantity, setQuantity] = useState(1);
+    const [selectedImage, setSelectedImage] = useState(null);
+
+    useEffect(() => {
+        if (product) {
+            setSelectedImage(product.main_image);
+        }
+    }, [product]);
 
     useEffect(() => {
         if (id) {
@@ -25,7 +32,7 @@ export default function ProductDetailsPage() {
     }, [dispatch, id]);
 
     const handleAddToCart = () => {
-        dispatch(addItemToCart({ productId: product._id, quantity }));
+        dispatch(addItemToCart({ productId: product.id, quantity }));
         router.push('/cart');
     };
 
@@ -65,13 +72,48 @@ export default function ProductDetailsPage() {
             </Link>
 
             <div className="flex flex-col md:flex-row gap-12 bg-white p-6 md:p-10 rounded-3xl shadow-sm border border-gray-100">
-                {/* Product Image */}
-                <div className="md:w-1/2 flex items-center justify-center bg-gray-50 rounded-2xl p-8 border border-gray-100">
-                    <img
-                        src={product.imageUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(product.name)}&background=random&size=400`}
-                        alt={product.name}
-                        className="w-full max-w-md object-contain mix-blend-multiply drop-shadow-xl"
-                    />
+                {/* Product Image & Gallery */}
+                <div className="md:w-1/2 flex flex-col gap-4">
+                    <div className="flex items-center justify-center bg-gray-50 rounded-2xl p-8 border border-gray-100 h-96 relative overflow-hidden group">
+                        <img
+                            src={selectedImage || product.main_image || `https://ui-avatars.com/api/?name=${encodeURIComponent(product.name)}&background=random&size=400`}
+                            alt={product.name}
+                            className="w-full h-full object-contain mix-blend-multiply drop-shadow-xl transition-transform duration-300 group-hover:scale-105"
+                        />
+                    </div>
+                    {product.images && product.images.length > 0 && (
+                        <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-200">
+                            {/* Main Image Thumbnail */}
+                            {product.main_image && !product.images.includes(product.main_image) && (
+                                <button
+                                    onClick={() => setSelectedImage(product.main_image)}
+                                    className={`flex-shrink-0 w-20 h-20 rounded-xl border-2 overflow-hidden bg-gray-50 transition-all ${selectedImage === product.main_image ? 'border-blue-600 shadow-md transform scale-105' : 'border-transparent hover:border-gray-200'
+                                        }`}
+                                >
+                                    <img
+                                        src={product.main_image}
+                                        alt="Main Thumbnail"
+                                        className="w-full h-full object-cover mix-blend-multiply"
+                                    />
+                                </button>
+                            )}
+                            {/* Additional Images */}
+                            {product.images.map((img, idx) => (
+                                <button
+                                    key={idx}
+                                    onClick={() => setSelectedImage(img)}
+                                    className={`flex-shrink-0 w-20 h-20 rounded-xl border-2 overflow-hidden bg-gray-50 transition-all ${selectedImage === img ? 'border-blue-600 shadow-md transform scale-105' : 'border-transparent hover:border-gray-200'
+                                        }`}
+                                >
+                                    <img
+                                        src={img}
+                                        alt={`Thumbnail ${idx + 1}`}
+                                        className="w-full h-full object-cover mix-blend-multiply"
+                                    />
+                                </button>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 {/* Product Details */}

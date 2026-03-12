@@ -11,21 +11,23 @@ export default function CartItem({ item }) {
 
     const handleUpdateQuantity = (newQuantity) => {
         if (newQuantity > 0 && newQuantity <= (product.countInStock || 10)) {
-            dispatch(updateItemInCart({ productId: product._id, quantity: newQuantity }));
+            console.log("ITEMS>ID", item.id);
+            
+            dispatch(updateItemInCart({ productId: item.id, quantity: newQuantity }));
         }
     };
 
     const handleRemove = () => {
-        dispatch(removeItemFromCart(product._id));
+        dispatch(removeItemFromCart(item.id));
     };
 
     if (!product) return null;
 
     return (
         <div className="flex flex-col sm:flex-row items-center gap-6 p-6 border-b border-gray-100 bg-white hover:bg-gray-50 transition-colors">
-            <Link href={`/products/${product._id}`} className="w-32 h-32 flex-shrink-0 rounded-xl overflow-hidden bg-white border border-gray-100 p-2">
+            <Link href={`/products/${product.id}`} className="w-32 h-32 flex-shrink-0 rounded-xl overflow-hidden bg-white border border-gray-100 p-2">
                 <img
-                    src={product.imageUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(product.name)}&background=random`}
+                    src={product.main_image || `https://ui-avatars.com/api/?name=${encodeURIComponent(product.name)}&background=random`}
                     alt={product.name}
                     className="w-full h-full object-contain mix-blend-multiply"
                 />
@@ -33,7 +35,7 @@ export default function CartItem({ item }) {
 
             <div className="flex-grow flex flex-col self-start w-full">
                 <div className="flex justify-between items-start">
-                    <Link href={`/products/${product._id}`}>
+                    <Link href={`/products/${product.id}`}>
                         <h3 className="text-lg font-semibold text-gray-900 hover:text-blue-600 transition-colors line-clamp-2 border-b-2 border-transparent hover:border-blue-600 inline-block">
                             {product.name}
                         </h3>

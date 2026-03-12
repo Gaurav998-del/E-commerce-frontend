@@ -11,11 +11,11 @@ export const addToCart = async (product_id, quantity) => {
 };
 
 export const updateCartItem = async (productId, quantity) => {
-    const response = await apiClient.put('/api/cart/update', { productId, quantity });
+    const response = await apiClient.put(`/api/cart/update/${productId}`, { quantity });
     return response.data;
 };
 
 export const removeFromCart = async (productId) => {
-    const response = await apiClient.delete('/api/cart/remove', { data: { productId } });
+    const response = await apiClient.delete(`/api/cart/remove/${productId}`);
     return response.data;
 };

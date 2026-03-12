@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { placeOrder } from '../../redux/orderSlice';
 import { clearCart } from '../../redux/cartSlice';
 import { initializeRazorpayCheckout } from '../../utils/razorpayCheckout';
+import { createPaymentSession } from '../../services/orderApi';
 import CheckoutSummary from '../../components/CheckoutSummary';
 import { useAuth } from '../../hooks/useAuth';
 import Link from 'next/link';
@@ -17,6 +18,8 @@ export default function CheckoutPage() {
     const { items, totalQty } = useSelector((state) => state.cart);
     const [isProcessing, setIsProcessing] = useState(false);
     const [errorDetails, setErrorDetails] = useState('');
+    console.log("ITEMSSSSS", items);
+
 
     const [shippingAddress, setShippingAddress] = useState({
         address: '',
@@ -49,26 +52,26 @@ export default function CheckoutPage() {
 
         try {
             // 1. Create order in backend
+            const formattedShippingAddress = `${shippingAddress.address}, ${shippingAddress.city}, ${shippingAddress.postalCode}, ${shippingAddress.country}`;
+
             const orderAction = await dispatch(placeOrder({
-                orderItems: items.map(item => ({
-                    product: item.product._id,
-                    name: item.product.name,
+                items: items.map(item => ({
+                    product_id: item.product.id,
                     quantity: item.quantity,
-                    price: item.product.price,
                 })),
-                shippingAddress,
-                paymentMethod: 'Razorpay',
-                itemsPrice: totalAmount, // Simplification for MVP
-                taxPrice: 0,
-                shippingPrice: 0,
-                totalPrice: totalAmount,
+                shipping_address: formattedShippingAddress,
             })).unwrap(); // Use unwrap to catch errors from rejected thunks
+            console.log("ORDER ACTION", orderAction);
 
-            const orderId = orderAction._id;
+            const orderId = orderAction.order.id;
 
-            // 2. Initialize Razorpay Checkout
+            // 2. Create Payment Session with Backend to get Razorpay Order ID
+            const sessionData = await createPaymentSession(orderId);
+            const razorpayOrderId = sessionData.payment.gatewayOrderId;
+
+            // 3. Initialize Razorpay Checkout
             await initializeRazorpayCheckout(
-                orderId,
+                razorpayOrderId,
                 totalAmount,
                 user,
                 (verificationResult) => {
